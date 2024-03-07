@@ -3,40 +3,53 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  HttpCode,
+  NotFoundException,
+  Put,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
+import { Track } from 'src/types';
+import { TrackIdParams } from './params/trackId.params';
 
 @Controller('track')
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
   @Post()
-  create(@Body() createTrackDto: CreateTrackDto) {
-    return this.trackService.create(createTrackDto);
+  createTrack(@Body() createTrackDto: CreateTrackDto): Track {
+    return this.trackService.createTrack(createTrackDto);
   }
 
   @Get()
-  findAll() {
-    return this.trackService.findAll();
+  getTracks(): Track[] {
+    return this.trackService.getTracks();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.trackService.findOne(+id);
+  getTrackById(@Param() { id }: TrackIdParams): Track {
+    const track = this.trackService.getTrackById(id);
+    if (!track) throw new NotFoundException();
+    return track;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTrackDto: UpdateTrackDto) {
-    return this.trackService.update(+id, updateTrackDto);
+  @Put(':id')
+  updateTrackById(
+    @Param() { id }: TrackIdParams,
+    @Body() updateTrackDto: UpdateTrackDto,
+  ): Track {
+    const track = this.trackService.updateTrackById(id, updateTrackDto);
+    if (!track) throw new NotFoundException();
+    return track;
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.trackService.remove(+id);
+  @HttpCode(204)
+  removeTrackById(@Param() { id }: TrackIdParams): void {
+    const track = this.trackService.removeTrackById(id);
+    if (!track) throw new NotFoundException();
   }
 }
