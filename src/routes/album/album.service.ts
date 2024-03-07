@@ -29,6 +29,9 @@ export class AlbumService {
   removeAlbumById(id: Album['id']): Album | null {
     const tracks = this.db.track.getDatasByField('albumId', id);
     tracks.forEach(({ id }) => this.db.track.updateData(id, { albumId: null }));
+    this.db.favorites.albums = this.db.favorites.albums.filter(
+      (albumId) => albumId !== id,
+    );
     return this.db.album.deleteData(id);
   }
 }

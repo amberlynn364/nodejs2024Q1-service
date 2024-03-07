@@ -36,6 +36,10 @@ export class ArtistService {
     albums.forEach(({ id }) =>
       this.db.album.updateData(id, { artistId: null }),
     );
+
+    this.db.favorites.artists = this.db.favorites.artists.filter(
+      (artistId) => artistId !== id,
+    );
     return this.db.artist.deleteData(id);
   }
 }

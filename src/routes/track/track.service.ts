@@ -28,6 +28,9 @@ export class TrackService {
   }
 
   removeTrackById(id: Track['id']): Track | null {
+    this.db.favorites.tracks = this.db.favorites.tracks.filter(
+      (trackId) => trackId !== id,
+    );
     return this.db.track.deleteData(id);
   }
 }
