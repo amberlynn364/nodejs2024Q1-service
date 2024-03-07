@@ -9,9 +9,9 @@ export class UserEntity implements User {
   updatedAt: User['updatedAt'];
 
   @Exclude()
-  password: string;
+  password: User['password'];
 
-  constructor(partial: Partial<User>) {
+  constructor(partial: Partial<UserEntity>) {
     Object.assign(this, partial);
   }
 }
