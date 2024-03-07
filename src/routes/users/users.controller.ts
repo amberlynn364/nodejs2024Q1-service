@@ -19,7 +19,7 @@ import { CreateUserDto } from './dto/createUser.dto';
 import { UpdatePasswordDto } from './dto/updateUserPassword.dto';
 
 @UseInterceptors(ClassSerializerInterceptor)
-@Controller('users')
+@Controller('user')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
