@@ -1,9 +1,7 @@
-import * as dotenv from 'dotenv';
 import { readFileSync } from 'fs';
 import * as yaml from 'js-yaml';
+import { join } from 'path';
 
-dotenv.config();
-
-export const PORT = process.env.PORT || 4000;
-
-export const API_DOCUMENT = yaml.load(readFileSync('./doc/api.yaml', 'utf8'));
+export const API_DOCUMENT = yaml.load(
+  readFileSync(join(__dirname, '../../doc/api.yaml'), 'utf8'),
+);

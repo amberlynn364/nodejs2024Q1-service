@@ -5,9 +5,11 @@ import { TrackModule } from './routes/track/track.module';
 import { ArtistModule } from './routes/artist/artist.module';
 import { AlbumModule } from './routes/album/album.module';
 import { FavoritesModule } from './routes/favorites/favorites.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     UsersModule,
     DbModule,
     TrackModule,
