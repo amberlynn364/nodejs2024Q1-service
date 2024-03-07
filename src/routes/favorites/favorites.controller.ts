@@ -6,16 +6,23 @@ import {
   UnprocessableEntityException,
   HttpCode,
   NotFoundException,
+  Get,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 import { AlbumIdParams } from '../album/params/albumId.params';
 import { Album, Artist, Track } from 'src/types';
 import { ArtistIdParams } from '../artist/params/artistId.params';
 import { TrackIdParams } from '../track/params/trackId.params';
+import { FavoritesResp } from './types';
 
 @Controller('favs')
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
+
+  @Get()
+  getFavorites(): FavoritesResp {
+    return this.favoritesService.getFavorites();
+  }
 
   @Post('album/:id')
   addAlbumToFavorites(@Param() params: AlbumIdParams): Album['id'] {
