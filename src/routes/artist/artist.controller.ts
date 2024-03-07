@@ -3,11 +3,11 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   HttpCode,
   NotFoundException,
+  Put,
 } from '@nestjs/common';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
@@ -36,7 +36,7 @@ export class ArtistController {
     return artist;
   }
 
-  @Patch(':id')
+  @Put(':id')
   updateArtistById(
     @Param() { id }: ArtistIdParams,
     @Body() updateArtistDto: UpdateArtistDto,
