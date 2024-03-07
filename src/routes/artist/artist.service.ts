@@ -31,6 +31,11 @@ export class ArtistService {
     tracks.forEach(({ id }) =>
       this.db.track.updateData(id, { artistId: null }),
     );
+
+    const albums = this.db.album.getDatasByField('artistId', id);
+    albums.forEach(({ id }) =>
+      this.db.album.updateData(id, { artistId: null }),
+    );
     return this.db.artist.deleteData(id);
   }
 }
