@@ -1,0 +1,20 @@
+services:
+  app:
+    depends_on:
+      - db
+    build:
+      dockerfile: app.Dockerfile
+    env_file: .env
+    volumes:
+      - ./src:/app/src
+    entrypoint: [npm, run]
+    command: start:dev
+    expose: [4000]
+    ports: 
+      - "${PORT}:${PORT}"
+
+  db:
+    build:
+      dockerfile: db.Dockerfile
+    env_file: .env
+    expose: [5432]
