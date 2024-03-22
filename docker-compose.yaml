@@ -1,20 +1,47 @@
 services:
   app:
+    image: amberlynn364/home-library-img:app
+    restart: always
     depends_on:
       - db
     build:
       dockerfile: app.Dockerfile
     env_file: .env
     volumes:
-      - ./src:/app/src
-    entrypoint: [npm, run]
-    command: start:dev
-    expose: [4000]
+      - .:/app
+    command:
+      - /bin/sh
+      - -c
+      - |
+        npx prisma generate
+        npx prisma migrate deploy
+        npm run start:dev
+    expose: 
+      - ${PORT}
     ports: 
       - "${PORT}:${PORT}"
+    networks:
+      - home-library
 
   db:
+    image: amberlynn364/home-library-img:db
+    restart: always
     build:
       dockerfile: db.Dockerfile
     env_file: .env
-    expose: [5432]
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - home-library
+
+volumes:
+  db-data:
+networks:
+      home-library:
+        driver: bridge
