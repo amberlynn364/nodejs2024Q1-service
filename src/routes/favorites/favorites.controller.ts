@@ -3,65 +3,65 @@ import {
   Post,
   Param,
   Delete,
-  UnprocessableEntityException,
   HttpCode,
   NotFoundException,
   Get,
+  UseFilters,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 import { AlbumIdParams } from '../album/params/albumId.params';
-import { Album, Artist, Track } from 'src/types';
 import { ArtistIdParams } from '../artist/params/artistId.params';
 import { TrackIdParams } from '../track/params/trackId.params';
 import { FavoritesResp } from './types';
+import { Album, Artist, Track } from '@prisma/client';
+import { PrismaClientExceptionFilter } from './exception.filter';
 
+@UseFilters(PrismaClientExceptionFilter)
 @Controller('favs')
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 
   @Get()
-  getFavorites(): FavoritesResp {
+  getFavorites(): Promise<FavoritesResp> {
     return this.favoritesService.getFavorites();
   }
 
   @Post('album/:id')
-  addAlbumToFavorites(@Param() params: AlbumIdParams): Album['id'] {
-    const id = this.favoritesService.addAlbumToFavorites(params.id);
-    if (id === null) throw new UnprocessableEntityException();
-    return id;
+  addAlbumToFavorites(@Param() params: AlbumIdParams): Promise<Album> {
+    return this.favoritesService.addAlbumToFavorites(params.id);
   }
 
   @Delete('album/:id')
   @HttpCode(204)
-  removeAlbumFromFavorites(@Param() params: AlbumIdParams): void {
-    const id = this.favoritesService.removeAlbumFromFavorites(params.id);
-    if (id === null) throw new NotFoundException();
+  async removeAlbumFromFavorites(
+    @Param() params: AlbumIdParams,
+  ): Promise<void> {
+    await this.favoritesService.removeAlbumFromFavorites(params.id);
   }
 
   @Post('artist/:id')
-  addArtistToFavorites(@Param() params: ArtistIdParams): Artist['id'] {
-    const id = this.favoritesService.addArtistToFavorites(params.id);
-    if (id === null) throw new UnprocessableEntityException();
-    return id;
+  addArtistToFavorites(@Param() params: ArtistIdParams): Promise<Artist> {
+    return this.favoritesService.addArtistToFavorites(params.id);
   }
 
   @Delete('artist/:id')
   @HttpCode(204)
-  removeArtistFromFavorites(@Param() params: ArtistIdParams): void {
-    const id = this.favoritesService.removeArtistFromFavorites(params.id);
-    if (id === null) throw new NotFoundException();
+  async removeArtistFromFavorites(
+    @Param() params: ArtistIdParams,
+  ): Promise<void> {
+    await this.favoritesService.removeArtistFromFavorites(params.id);
   }
 
   @Post('track/:id')
-  addTrackToFavorites(@Param() params: TrackIdParams): Track['id'] {
-    const id = this.favoritesService.addTrackToFavorites(params.id);
-    if (id === null) throw new UnprocessableEntityException();
-    return id;
+  addTrackToFavorites(@Param() params: TrackIdParams): Promise<Track> {
+    return this.favoritesService.addTrackToFavorites(params.id);
   }
 
   @Delete('track/:id')
   @HttpCode(204)
-  removeTrackFromFavorites(@Param() params: TrackIdParams): void {
+  async removeTrackFromFavorites(
+    @Param() params: TrackIdParams,
+  ): Promise<void> {
     const id = this.favoritesService.removeTrackFromFavorites(params.id);
     if (id === null) throw new NotFoundException();
   }

@@ -2,44 +2,28 @@ import { Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { DbService } from 'src/db/db.service';
-import { Artist } from 'src/types';
+import { Artist } from '@prisma/client';
 
 @Injectable()
 export class ArtistService {
   constructor(private readonly db: DbService) {}
-  createArtist(createArtistDto: CreateArtistDto): Artist {
-    return this.db.artist.createData(createArtistDto);
+  createArtist(data: CreateArtistDto): Promise<Artist> {
+    return this.db.artist.create({ data });
   }
 
-  getArtists(): Artist[] {
-    return this.db.artist.getData();
+  getArtists(): Promise<Artist[]> {
+    return this.db.artist.findMany();
   }
 
-  getArtistById(id: Artist['id']): Artist | null {
-    return this.db.artist.getDataById(id);
+  getArtistById(id: Artist['id']): Promise<Artist> {
+    return this.db.artist.findUniqueOrThrow({ where: { id } });
   }
 
-  updateArtistById(
-    id: Artist['id'],
-    updateArtistDto: UpdateArtistDto,
-  ): Artist | null {
-    return this.db.artist.updateData(id, updateArtistDto);
+  updateArtistById(id: Artist['id'], data: UpdateArtistDto): Promise<Artist> {
+    return this.db.artist.update({ where: { id }, data });
   }
 
-  removeArtistById(id: Artist['id']): Artist | null {
-    const tracks = this.db.track.getDatasByField('artistId', id);
-    tracks.forEach(({ id }) =>
-      this.db.track.updateData(id, { artistId: null }),
-    );
-
-    const albums = this.db.album.getDatasByField('artistId', id);
-    albums.forEach(({ id }) =>
-      this.db.album.updateData(id, { artistId: null }),
-    );
-
-    this.db.favorites.artists = this.db.favorites.artists.filter(
-      (artistId) => artistId !== id,
-    );
-    return this.db.artist.deleteData(id);
+  removeArtistById(id: Artist['id']): Promise<Artist> {
+    return this.db.artist.delete({ where: { id } });
   }
 }

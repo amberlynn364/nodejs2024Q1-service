@@ -1,57 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { DbService } from 'src/db/db.service';
 import { CreateUserDto } from './dto/createUser.dto';
-import { User } from 'src/types';
 import { UpdatePasswordDto } from './dto/updateUserPassword.dto';
-import { UpdateUserDto } from './dto/updateUser.dto';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly db: DbService) {}
 
-  createUser(createUserDto: CreateUserDto): User {
-    return this.db.user.createData({
-      ...createUserDto,
-      version: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    });
+  createUser(data: CreateUserDto): Promise<User> {
+    return this.db.user.create({ data });
   }
 
-  getUser(id: User['id']): User | null {
-    return this.db.user.getDataById(id);
+  getUser(id: User['id']): Promise<User> {
+    return this.db.user.findUniqueOrThrow({ where: { id } });
   }
 
-  getUsers(): User[] {
-    return this.db.user.getData();
+  getUsers(): Promise<User[]> {
+    return this.db.user.findMany();
   }
 
-  updatePassword(
+  async updatePassword(
     id: User['id'],
-    updatePasswordDto: UpdatePasswordDto,
-  ): User | false | null {
-    const { oldPassword, newPassword } = updatePasswordDto;
-    const user = this.getUser(id);
-    if (!user) return null;
-    if (user.password !== oldPassword) return false;
-    return this.db.user.updateData(id, {
-      password: newPassword,
-      version: user.version + 1,
-      updatedAt: Date.now(),
+    { oldPassword, newPassword }: UpdatePasswordDto,
+  ): Promise<User> | null {
+    const user = await this.db.user.findUniqueOrThrow({ where: { id } });
+    if (user.password !== oldPassword) return null;
+    return this.db.user.update({
+      where: { id },
+      data: { password: newPassword, version: user.version + 1 },
     });
   }
 
-  updateUserData(id: User['id'], updateUserDto: UpdateUserDto): User | null {
-    const user = this.getUser(id);
-    if (!user) return null;
-    return this.db.user.updateData(id, {
-      ...updateUserDto,
-      version: user.version + 1,
-      updatedAt: Date.now(),
-    });
-  }
-
-  removeUser(id: User['id']): User | null {
-    return this.db.user.deleteData(id);
+  removeUser(id: User['id']): Promise<User> {
+    return this.db.user.delete({ where: { id } });
   }
 }

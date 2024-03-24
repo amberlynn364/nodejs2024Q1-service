@@ -4,7 +4,6 @@ import {
   Delete,
   ForbiddenException,
   Get,
-  NotFoundException,
   Param,
   Post,
   Put,
@@ -24,39 +23,36 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Get()
-  getUsers(): UserEntity[] {
-    const users = this.userService.getUsers();
+  async getUsers(): Promise<UserEntity[]> {
+    const users = await this.userService.getUsers();
     return users.map((user) => new UserEntity(user));
   }
 
   @Get(':id')
-  getUser(@Param() { id }: userIdParams): UserEntity {
-    const user = this.userService.getUser(id);
-    if (!user) throw new NotFoundException();
+  async getUser(@Param() { id }: userIdParams): Promise<UserEntity> {
+    const user = await this.userService.getUser(id);
     return new UserEntity(user);
   }
 
   @Post()
-  createUser(@Body() createUserDto: CreateUserDto): UserEntity {
-    const user = this.userService.createUser(createUserDto);
+  async createUser(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
+    const user = await this.userService.createUser(createUserDto);
     return new UserEntity(user);
   }
 
   @Put(':id')
-  updateUserPassword(
+  async updateUserPassword(
     @Param() { id }: userIdParams,
     @Body() updatePasswordDto: UpdatePasswordDto,
-  ): UserEntity {
-    const user = this.userService.updatePassword(id, updatePasswordDto);
-    if (user === null) throw new NotFoundException();
-    if (user === false) throw new ForbiddenException('wrong old password');
+  ): Promise<UserEntity> {
+    const user = await this.userService.updatePassword(id, updatePasswordDto);
+    if (!user) throw new ForbiddenException('oldPassword is wrong');
     return new UserEntity(user);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  removeUser(@Param() { id }: userIdParams): void {
-    const user = this.userService.removeUser(id);
-    if (!user) throw new NotFoundException();
+  async removeUser(@Param() { id }: userIdParams): Promise<void> {
+    await this.userService.removeUser(id);
   }
 }

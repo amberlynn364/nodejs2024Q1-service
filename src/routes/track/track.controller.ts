@@ -6,50 +6,44 @@ import {
   Param,
   Delete,
   HttpCode,
-  NotFoundException,
   Put,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { Track } from 'src/types';
 import { TrackIdParams } from './params/trackId.params';
+import { Track } from '@prisma/client';
 
 @Controller('track')
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
   @Post()
-  createTrack(@Body() createTrackDto: CreateTrackDto): Track {
+  createTrack(@Body() createTrackDto: CreateTrackDto): Promise<Track> {
     return this.trackService.createTrack(createTrackDto);
   }
 
   @Get()
-  getTracks(): Track[] {
+  getTracks(): Promise<Track[]> {
     return this.trackService.getTracks();
   }
 
   @Get(':id')
-  getTrackById(@Param() { id }: TrackIdParams): Track {
-    const track = this.trackService.getTrackById(id);
-    if (!track) throw new NotFoundException();
-    return track;
+  getTrackById(@Param() { id }: TrackIdParams): Promise<Track> {
+    return this.trackService.getTrackById(id);
   }
 
   @Put(':id')
   updateTrackById(
     @Param() { id }: TrackIdParams,
     @Body() updateTrackDto: UpdateTrackDto,
-  ): Track {
-    const track = this.trackService.updateTrackById(id, updateTrackDto);
-    if (!track) throw new NotFoundException();
-    return track;
+  ): Promise<Track> {
+    return this.trackService.updateTrackById(id, updateTrackDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  removeTrackById(@Param() { id }: TrackIdParams): void {
-    const track = this.trackService.removeTrackById(id);
-    if (!track) throw new NotFoundException();
+  async removeTrackById(@Param() { id }: TrackIdParams): Promise<void> {
+    await this.trackService.removeTrackById(id);
   }
 }

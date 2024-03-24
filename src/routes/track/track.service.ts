@@ -2,35 +2,32 @@ import { Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { DbService } from 'src/db/db.service';
-import { Track } from 'src/types';
+import { Track } from '@prisma/client';
 
 @Injectable()
 export class TrackService {
   constructor(private readonly db: DbService) {}
 
-  createTrack(createTrackDto: CreateTrackDto): Track {
-    return this.db.track.createData(createTrackDto);
+  createTrack(data: CreateTrackDto): Promise<Track> {
+    return this.db.track.create({ data });
   }
 
-  getTracks(): Track[] {
-    return this.db.track.getData();
+  getTracks(): Promise<Track[]> {
+    return this.db.track.findMany();
   }
 
-  getTrackById(id: Track['id']): Track | null {
-    return this.db.track.getDataById(id);
+  getTrackById(id: Track['id']): Promise<Track> {
+    return this.db.track.findUniqueOrThrow({ where: { id } });
   }
 
-  updateTrackById(
-    id: Track['id'],
-    updateTrackDto: UpdateTrackDto,
-  ): Track | null {
-    return this.db.track.updateData(id, updateTrackDto);
+  updateTrackById(id: Track['id'], data: UpdateTrackDto): Promise<Track> {
+    return this.db.track.update({
+      where: { id },
+      data,
+    });
   }
 
-  removeTrackById(id: Track['id']): Track | null {
-    this.db.favorites.tracks = this.db.favorites.tracks.filter(
-      (trackId) => trackId !== id,
-    );
-    return this.db.track.deleteData(id);
+  removeTrackById(id: Track['id']): Promise<Track> {
+    return this.db.track.delete({ where: { id } });
   }
 }
