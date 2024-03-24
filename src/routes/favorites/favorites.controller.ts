@@ -4,7 +4,6 @@ import {
   Param,
   Delete,
   HttpCode,
-  NotFoundException,
   Get,
   UseFilters,
 } from '@nestjs/common';
@@ -62,7 +61,6 @@ export class FavoritesController {
   async removeTrackFromFavorites(
     @Param() params: TrackIdParams,
   ): Promise<void> {
-    const id = this.favoritesService.removeTrackFromFavorites(params.id);
-    if (id === null) throw new NotFoundException();
+    await this.favoritesService.removeTrackFromFavorites(params.id);
   }
 }
