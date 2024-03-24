@@ -1,3 +1,4 @@
+import { Track } from '@prisma/client';
 import {
   IsNotEmpty,
   IsOptional,
@@ -5,7 +6,6 @@ import {
   IsString,
   IsUUID,
 } from 'class-validator';
-import { Track } from 'src/types';
 
 export class CreateTrackDto implements Omit<Track, 'id'> {
   @IsString()

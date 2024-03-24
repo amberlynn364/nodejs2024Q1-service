@@ -1,12 +1,16 @@
-import { Exclude } from 'class-transformer';
-import { User } from 'src/types';
+import { User } from '@prisma/client';
+import { Exclude, Transform } from 'class-transformer';
 
 export class UserEntity implements User {
   id: User['id'];
   login: User['login'];
   version: User['version'];
-  createdAt: User['createdAt'];
-  updatedAt: User['updatedAt'];
+
+  @Transform(({ value }) => value.getTime())
+  createdAt: Date;
+
+  @Transform(({ value }) => value.getTime())
+  updatedAt: Date;
 
   @Exclude()
   password: User['password'];
