@@ -10,13 +10,16 @@ import {
   HttpCode,
   UseInterceptors,
   ClassSerializerInterceptor,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserEntity } from './entities/user.entity';
 import { userIdParams } from './params/userId.params';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdatePasswordDto } from './dto/updateUserPassword.dto';
+import { AccessGuard } from 'src/auth/guards/access.guard';
 
+@UseGuards(AccessGuard)
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('user')
 export class UsersController {

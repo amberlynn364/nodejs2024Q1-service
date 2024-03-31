@@ -7,10 +7,11 @@ import { AlbumModule } from './routes/album/album.module';
 import { FavoritesModule } from './routes/favorites/favorites.module';
 import { ConfigModule } from '@nestjs/config';
 import { LoggingModule } from './logging/logging.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     UsersModule,
     DbModule,
     TrackModule,
@@ -18,6 +19,7 @@ import { LoggingModule } from './logging/logging.module';
     AlbumModule,
     FavoritesModule,
     LoggingModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
