@@ -6,6 +6,7 @@ import {
   HttpCode,
   Get,
   UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 import { AlbumIdParams } from '../album/params/albumId.params';
@@ -14,7 +15,9 @@ import { TrackIdParams } from '../track/params/trackId.params';
 import { FavoritesResp } from './types';
 import { Album, Artist, Track } from '@prisma/client';
 import { PrismaClientExceptionFilter } from './exception.filter';
+import { AccessGuard } from 'src/auth/guards/access.guard';
 
+@UseGuards(AccessGuard)
 @UseFilters(PrismaClientExceptionFilter)
 @Controller('favs')
 export class FavoritesController {
